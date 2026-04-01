@@ -1,8 +1,8 @@
 {
-  "name": "hltb-scrapper",
+  "name": "howlongtobeat-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "buildManifest.js",
+  "description": "A high-performance, self-hostable REST API for HowLongToBeat.com. Features in-memory caching, TypeScript support, and resilient scraping logic to bypass security headers.",
+  "main": "dist/index.js",
   "directories": {
     "doc": "docs"
   },
@@ -12,9 +12,17 @@
     "dev": "ts-node src/index.ts",
     "test": "jest"
   },
-  "keywords": [],
+  "keywords": [
+    "howlongtobeat",
+    "hltb",
+    "api",
+    "scraper",
+    "gaming",
+    "typescript",
+    "express"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "cheerio": "^1.2.0",

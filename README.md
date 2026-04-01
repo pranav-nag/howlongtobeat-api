@@ -1,6 +1,6 @@
-# HowLongToBeat Scraper API
+# howlongtobeat-api
 
-A standalone, open-source REST API to scrape game completion times, platforms, and metadata from HowLongToBeat.com. Designed to be universally deployable and resilient to HLTB's frequent security updates.
+A high-performance, self-hostable REST API for HowLongToBeat.com. Features in-memory caching, TypeScript support, and resilient scraping logic to bypass security headers.
 
 ## Features
 
