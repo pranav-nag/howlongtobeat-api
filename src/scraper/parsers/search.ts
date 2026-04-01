@@ -52,7 +52,7 @@ export async function searchGames(query: string): Promise<SearchResult[]> {
   // 2. Perform the actual search with the security headers
   const payload: any = { 
     searchType: "games", 
-    searchTerms: query.split(' '), 
+    searchTerms: [query], // Use the full query as a single string in the list
     searchPage: 1, 
     size: 20,
     searchOptions: {
@@ -61,11 +61,13 @@ export async function searchGames(query: string): Promise<SearchResult[]> {
         platform: "",
         sortCategory: "popular",
         rangeCategory: "main",
-        rangeTime: { min: 0, max: 0 },
-        gameplay: { perspective: "", flow: "", genre: "" },
+        rangeTime: { min: null, max: null }, // HLTB uses null now instead of 0
+        gameplay: { perspective: "", flow: "", genre: "", difficulty: "" }, // Added difficulty
+        rangeYear: { min: "", max: "" }, // Added rangeYear
         modifier: ""
       },
       users: { sortCategory: "postcount" },
+      lists: { sortCategory: "follows" }, // Added lists
       filter: "",
       sort: 0,
       randomizer: 0

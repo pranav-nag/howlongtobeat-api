@@ -1,8 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { searchGames } from '../scraper/parsers/search';
-import { getGameDetails } from '../scraper/parsers/detail';
+import { parseGameDetails } from '../scraper/parsers/detail';
 import { appCache } from '../cache/memory';
 import { ParserError } from '../types';
+import { fetchHltb } from '../scraper/hltb-client';
 
 export const apiRouter = Router();
 
@@ -55,7 +56,14 @@ apiRouter.get('/game/:id', async (req: Request, res: Response): Promise<void> =>
   }
 
   try {
-    const details = await getGameDetails(id);
+    // 1. Visit homepage to ensure session cookies are set
+    await fetchHltb('https://howlongtobeat.com/');
+    // 2. Fetch the game detail page HTML
+    const html = await fetchHltb(`https://howlongtobeat.com/game/${id}`);
+    
+    // 3. Parse the HTML using the pure parser function
+    const details = parseGameDetails(id, html);
+    
     appCache.set(cacheKey, details);
     res.json(details);
   } catch (error: any) {

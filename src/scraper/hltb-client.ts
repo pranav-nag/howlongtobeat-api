@@ -1,7 +1,9 @@
 const USER_AGENTS = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
 ];
+
+const selectedUserAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
 
 let sessionCookies: string[] = [];
 
@@ -9,12 +11,12 @@ export async function fetchHltb(url: string, options?: RequestInit): Promise<str
   const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
   
   const headers = new Headers(options?.headers);
-  headers.set('User-Agent', userAgent);
-  headers.set('Accept', '*/*');
+  headers.set('User-Agent', selectedUserAgent);
+  headers.set('Accept', 'application/json, text/plain, */*');
   headers.set('Accept-Language', 'en-US,en;q=0.9');
   headers.set('Origin', 'https://howlongtobeat.com');
   headers.set('Referer', 'https://howlongtobeat.com/');
-  headers.set('Sec-Ch-Ua', '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"');
+  headers.set('Sec-Ch-Ua', '"Chromium";v="123", "Not:A-Brand";v="8"');
   headers.set('Sec-Ch-Ua-Mobile', '?0');
   headers.set('Sec-Ch-Ua-Platform', '"Windows"');
   headers.set('Sec-Fetch-Dest', 'empty');
