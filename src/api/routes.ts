@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { searchGames } from '../scraper/parsers/search';
+import { parseSearchResponse, searchGames } from '../scraper/parsers/search';
 import { parseGameDetails } from '../scraper/parsers/detail';
 import { appCache } from '../cache/memory';
 import { ParserError } from '../types';
-import { fetchHltb } from '../scraper/hltb-client';
+import { fetchHltb, ensureSession, performSearch } from '../scraper/hltb-client';
 
 export const apiRouter = Router();
 
@@ -27,7 +27,18 @@ apiRouter.get('/search', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const results = await searchGames(query);
+    const rawJson = await performSearch(query);
+    
+    // Fallback: Because searchGames is not yet refactored to parseSearchResponse
+    // We try to use parseSearchResponse if it exists (Task 2), otherwise we call searchGames (Temporary Task 1 fallback)
+    let results;
+    if (typeof parseSearchResponse === 'function') {
+        results = parseSearchResponse(rawJson);
+    } else {
+        // Temporary fallback until search.ts is updated in Task 2
+        results = await searchGames(query); 
+    }
+    
     appCache.set(cacheKey, results);
     res.json(results);
   } catch (error: any) {
@@ -56,12 +67,9 @@ apiRouter.get('/game/:id', async (req: Request, res: Response): Promise<void> =>
   }
 
   try {
-    // 1. Visit homepage to ensure session cookies are set
-    await fetchHltb('https://howlongtobeat.com/');
-    // 2. Fetch the game detail page HTML
+    await ensureSession();
     const html = await fetchHltb(`https://howlongtobeat.com/game/${id}`);
     
-    // 3. Parse the HTML using the pure parser function
     const details = parseGameDetails(id, html);
     
     appCache.set(cacheKey, details);
