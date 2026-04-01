@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { GameDetails, ParserError } from '../../types';
+import { GameDetails, ParserError, PlatformTime, GameDLC } from '../../types';
 
 export function parseGameDetails(id: string, html: string): GameDetails {
   try {
@@ -12,22 +12,48 @@ export function parseGameDetails(id: string, html: string): GameDetails {
       try {
         const nextData = JSON.parse(nextDataScript);
         const gameData = nextData?.props?.pageProps?.game?.data?.game?.[0];
+        const platformData = nextData?.props?.pageProps?.game?.data?.platformData || [];
+        const relationships = nextData?.props?.pageProps?.game?.data?.relationships || [];
         
         if (gameData) {
+          const platforms: PlatformTime[] = platformData.map((p: any) => ({
+            name: p.platform,
+            time: formatTime(p.comp_main)
+          }));
+
+          const dlcs: GameDLC[] = relationships
+            .filter((r: any) => r.game_type === 'dlc')
+            .map((r: any) => ({
+              id: String(r.game_id),
+              title: r.game_name
+            }));
+
+          // Fallback simple parsing if platformData is missing
+          if (platforms.length === 0 && gameData.profile_platform) {
+            gameData.profile_platform.split(', ').forEach((p: string) => {
+              platforms.push({ name: p, time: 'Unknown' });
+            });
+          }
+
           return {
             id,
             title: gameData.game_name || 'Unknown Title',
             imageUrl: gameData.game_image ? `https://howlongtobeat.com/games/${gameData.game_image}` : '',
             developer: gameData.profile_dev || 'Unknown',
             publisher: gameData.profile_pub || 'Unknown',
-            platforms: gameData.profile_platform ? gameData.profile_platform.split(', ') : [],
+            platforms,
             genres: gameData.profile_genre ? gameData.profile_genre.split(', ') : [],
             times: {
               mainStory: formatTime(gameData.comp_main),
               mainExtras: formatTime(gameData.comp_plus),
               completionist: formatTime(gameData.comp_100),
               allPlayStyles: formatTime(gameData.comp_all)
-            }
+            },
+            dlcs,
+            rating: gameData.review_score ? `${gameData.review_score}%` : 'Unknown',
+            retirementRate: gameData.count_retired && gameData.count_total 
+              ? `${((gameData.count_retired / gameData.count_total) * 100).toFixed(1)}%` 
+              : 'Unknown'
           };
         }
       } catch (e) {
@@ -35,9 +61,8 @@ export function parseGameDetails(id: string, html: string): GameDetails {
       }
     }
 
-    // Fallback to DOM parsing if JSON extraction fails
+    // Fallback to DOM parsing
     const titleNode = $('.GameHeader-module__zQS9VW__profile_header.shadow_text');
-    // Remove any children nodes (like comments or spans) from the text extraction
     titleNode.children().remove();
     const title = titleNode.text().trim() || 'Unknown Title';
 
@@ -46,7 +71,7 @@ export function parseGameDetails(id: string, html: string): GameDetails {
     const developer = $('.GameSummary-module__ndH3gG__profile_info:contains("Developer:")').text().replace('Developer:', '').trim() || 'Unknown';
     const publisher = $('.GameSummary-module__ndH3gG__profile_info:contains("Publisher:")').text().replace('Publisher:', '').trim() || 'Unknown';
     const platformsText = $('.GameSummary-module__ndH3gG__profile_info:contains("Platforms:")').text().replace('Platforms:', '').trim();
-    const platforms = platformsText ? platformsText.split(', ') : [];
+    const platforms = platformsText ? platformsText.split(', ').map(p => ({ name: p, time: 'Unknown' })) : [];
     const genresText = $('.GameSummary-module__ndH3gG__profile_info:contains("Genres:")').text().replace('Genres:', '').trim();
     const genres = genresText ? genresText.split(', ') : [];
 
@@ -82,14 +107,16 @@ export function parseGameDetails(id: string, html: string): GameDetails {
       publisher,
       platforms,
       genres,
-      times
+      times,
+      dlcs: [],
+      rating: 'Unknown',
+      retirementRate: 'Unknown'
     };
   } catch (error) {
     throw new ParserError('Failed to parse game details HTML');
   }
 }
 
-// Helper to format seconds to a readable string like "60h" or "60h 30m"
 function formatTime(seconds: number | undefined): string {
   if (!seconds) return 'Unknown';
   
