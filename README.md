@@ -62,8 +62,47 @@ The server will be running on `http://localhost:3000`.
 ### 1. `GET /api/search?q={game_title}`
 Returns a list of games matching the query.
 
+**Example Response:**
+```json
+[
+  {
+    "id": "68151",
+    "title": "Elden Ring",
+    "imageUrl": "https://howlongtobeat.com/games/68151_Elden_Ring.jpg",
+    "releaseYear": 2022
+  }
+]
+```
+
 ### 2. `GET /api/game/{game_id}`
 Returns the comprehensive details for a specific game ID.
+
+**Example Response:**
+```json
+{
+  "id": "68151",
+  "title": "Elden Ring",
+  "imageUrl": "https://howlongtobeat.com/games/68151_Elden_Ring.jpg",
+  "developer": "FromSoftware",
+  "publisher": "Bandai Namco Entertainment",
+  "platforms": [
+    { "name": "PC", "time": "58h 47m" },
+    { "name": "PlayStation 5", "time": "60h 38m" }
+  ],
+  "genres": ["Action", "Open World", "Role-Playing"],
+  "times": {
+    "mainStory": "60h",
+    "mainExtras": "104h 22m",
+    "completionist": "141h 41m",
+    "allPlayStyles": "110h 47m"
+  },
+  "dlcs": [
+    { "id": "139385", "title": "Shadow of the Erdtree" }
+  ],
+  "rating": "93%",
+  "retirementRate": "3.7%"
+}
+```
 
 ## Resilience Notice
 
