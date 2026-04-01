@@ -39,6 +39,7 @@ export async function fetchHltb(url: string, options?: RequestInit): Promise<str
       }
 
       if (!response.ok) {
+        console.error(`Fetch failed for URL: ${url}`);
         throw new Error(`HLTB fetch failed: ${response.status} ${response.statusText}`);
       }
       
