@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { parseSearchResponse, searchGames } from '../scraper/parsers/search';
+import { parseSearchResponse } from '../scraper/parsers/search';
 import { parseGameDetails } from '../scraper/parsers/detail';
 import { appCache } from '../cache/memory';
 import { ParserError } from '../types';
@@ -11,13 +11,15 @@ const CACHE_MAX_AGE = 86400; // 24 hours
 
 apiRouter.get('/search', async (req: Request, res: Response): Promise<void> => {
   const query = req.query.q as string;
+  const force = req.query.force === 'true';
+
   if (!query) {
     res.status(400).json({ error: 'Missing search query' });
     return;
   }
 
   const cacheKey = `search:${query.toLowerCase()}`;
-  const cachedData = appCache.get(cacheKey);
+  const cachedData = force ? undefined : appCache.get(cacheKey);
 
   res.setHeader('Cache-Control', `public, max-age=${CACHE_MAX_AGE}`);
 
@@ -28,22 +30,17 @@ apiRouter.get('/search', async (req: Request, res: Response): Promise<void> => {
 
   try {
     const rawJson = await performSearch(query);
-    
-    // Fallback: Because searchGames is not yet refactored to parseSearchResponse
-    // We try to use parseSearchResponse if it exists (Task 2), otherwise we call searchGames (Temporary Task 1 fallback)
-    let results;
-    if (typeof parseSearchResponse === 'function') {
-        results = parseSearchResponse(rawJson);
-    } else {
-        // Temporary fallback until search.ts is updated in Task 2
-        results = await searchGames(query); 
-    }
+    const results = parseSearchResponse(rawJson);
     
     appCache.set(cacheKey, results);
     res.json(results);
   } catch (error: any) {
     console.error('Search error:', error.message);
-    if (error instanceof ParserError || error.message.includes('HLTB fetch failed')) {
+    if (error.message.includes('404')) {
+      res.status(404).json({ error: 'Not Found' });
+    } else if (error.message.includes('429') || error.message.includes('403')) {
+      res.status(429).json({ error: 'Too Many Requests / Blocked by HLTB' });
+    } else if (error instanceof ParserError || error.message.includes('HLTB fetch failed')) {
       res.status(502).json({ 
         error: 'Failed to fetch or parse HowLongToBeat response. HLTB may have updated their security measures.',
         details: error.message
@@ -56,8 +53,10 @@ apiRouter.get('/search', async (req: Request, res: Response): Promise<void> => {
 
 apiRouter.get('/game/:id', async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id as string;
+  const force = req.query.force === 'true';
+
   const cacheKey = `game:${id}`;
-  const cachedData = appCache.get(cacheKey);
+  const cachedData = force ? undefined : appCache.get(cacheKey);
 
   res.setHeader('Cache-Control', `public, max-age=${CACHE_MAX_AGE}`);
 
@@ -76,7 +75,11 @@ apiRouter.get('/game/:id', async (req: Request, res: Response): Promise<void> =>
     res.json(details);
   } catch (error: any) {
     console.error('Details error:', error.message);
-    if (error instanceof ParserError || error.message.includes('HLTB fetch failed')) {
+    if (error.message.includes('404')) {
+      res.status(404).json({ error: 'Game Not Found' });
+    } else if (error.message.includes('429') || error.message.includes('403')) {
+      res.status(429).json({ error: 'Too Many Requests / Blocked by HLTB' });
+    } else if (error instanceof ParserError || error.message.includes('HLTB fetch failed')) {
       res.status(502).json({ 
         error: 'Failed to fetch or parse game details. HLTB may have updated their security measures.',
         details: error.message
