@@ -1,10 +1,17 @@
 import * as cheerio from 'cheerio';
-import { GameDetails, ParserError, PlatformTime, GameDLC } from '../../types';
+import { 
+  GameDetails, ParserError, PlatformTime, GameDLC, 
+  PlaystyleDetails, SpeedrunDetails, InDepthTimes, 
+  GameStats, ReleaseDates 
+} from '../../types';
 
 export function parseGameDetails(id: string, html: string): GameDetails {
   try {
     const $ = cheerio.load(html);
     
+    // Always try to extract "Updated" from DOM as it's human readable (e.g., "11 Mins Ago")
+    const updatedText = $('.GameSummary-module__ndH3gG__profile_info:contains("Updated:")').text().replace('Updated:', '').trim();
+
     // Try to extract the __NEXT_DATA__ JSON
     const nextDataScript = $('#__NEXT_DATA__').html();
     
@@ -18,7 +25,13 @@ export function parseGameDetails(id: string, html: string): GameDetails {
         if (gameData) {
           const platforms: PlatformTime[] = platformData.map((p: any) => ({
             name: p.platform,
-            time: formatTime(p.comp_main)
+            time: formatTime(p.comp_main),
+            polled: p.count_comp,
+            main: formatTime(p.comp_main),
+            mainExtra: formatTime(p.comp_plus),
+            completionist: formatTime(p.comp_100),
+            fastest: formatTime(p.comp_low),
+            slowest: formatTime(p.comp_high)
           }));
 
           const dlcs: GameDLC[] = relationships
@@ -35,6 +48,31 @@ export function parseGameDetails(id: string, html: string): GameDetails {
             });
           }
 
+          const inDepthTimes: InDepthTimes = {
+            mainStory: getPlaystyleDetails(gameData.comp_main_avg, gameData.comp_main_med, gameData.comp_main_l, gameData.comp_main_h),
+            mainExtras: getPlaystyleDetails(gameData.comp_plus_avg, gameData.comp_plus_med, gameData.comp_plus_l, gameData.comp_plus_h),
+            completionist: getPlaystyleDetails(gameData.comp_100_avg, gameData.comp_100_med, gameData.comp_100_l, gameData.comp_100_h),
+            allPlayStyles: getPlaystyleDetails(gameData.comp_all_avg, gameData.comp_all_med, gameData.comp_all_l, gameData.comp_all_h),
+            anyPercentage: getSpeedrunDetails(gameData.comp_speed_avg, gameData.comp_speed_med, gameData.comp_speed_min, gameData.comp_speed_max),
+            hundredPercentage: getSpeedrunDetails(gameData.comp_speed100_avg, gameData.comp_speed100_med, gameData.comp_speed100_min, gameData.comp_speed100_max),
+            coOp: getPlaystyleDetails(gameData.invested_co_avg, gameData.invested_co_med, gameData.invested_co_l, gameData.invested_co_h),
+            competitive: getPlaystyleDetails(gameData.invested_mp_avg, gameData.invested_mp_med, gameData.invested_mp_l, gameData.invested_mp_h)
+          };
+
+          const stats: GameStats = {
+            playing: gameData.count_playing || 0,
+            backlogs: gameData.count_backlog || 0,
+            replays: gameData.count_replay || 0,
+            retired: gameData.count_retired || 0,
+            beat: gameData.count_comp || 0
+          };
+
+          const releaseDates: ReleaseDates = {
+            na: gameData.release_na ? String(gameData.release_na) : 'Unknown',
+            eu: gameData.release_eu ? String(gameData.release_eu) : 'Unknown',
+            jp: gameData.release_jp ? String(gameData.release_jp) : 'Unknown'
+          };
+
           return {
             id,
             title: gameData.game_name || 'Unknown Title',
@@ -49,11 +87,17 @@ export function parseGameDetails(id: string, html: string): GameDetails {
               completionist: formatTime(gameData.comp_100),
               allPlayStyles: formatTime(gameData.comp_all)
             },
+            inDepthTimes,
             dlcs,
             rating: gameData.review_score ? `${gameData.review_score}%` : 'Unknown',
             retirementRate: gameData.count_retired && gameData.count_total 
               ? `${((gameData.count_retired / gameData.count_total) * 100).toFixed(1)}%` 
-              : 'Unknown'
+              : 'Unknown',
+            summary: gameData.profile_summary || '',
+            stats,
+            releaseDates,
+            alias: gameData.game_alias || '',
+            updated: updatedText || (gameData.added_stats ? String(gameData.added_stats) : '')
           };
         }
       } catch (e) {
@@ -99,6 +143,9 @@ export function parseGameDetails(id: string, html: string): GameDetails {
       }
     });
 
+    const emptyStats: GameStats = { playing: 0, backlogs: 0, replays: 0, retired: 0, beat: 0 };
+    const emptyReleaseDates: ReleaseDates = { na: 'Unknown', eu: 'Unknown', jp: 'Unknown' };
+
     return {
       id,
       title,
@@ -110,7 +157,12 @@ export function parseGameDetails(id: string, html: string): GameDetails {
       times,
       dlcs: [],
       rating: 'Unknown',
-      retirementRate: 'Unknown'
+      retirementRate: 'Unknown',
+      summary: '',
+      stats: emptyStats,
+      releaseDates: emptyReleaseDates,
+      alias: '',
+      updated: updatedText
     };
   } catch (error) {
     throw new ParserError('Failed to parse game details HTML');
@@ -132,4 +184,22 @@ function formatTime(seconds: number | undefined): string {
   }
   
   return 'Unknown';
+}
+
+function getPlaystyleDetails(avg?: number, med?: number, l?: number, h?: number): PlaystyleDetails {
+  return {
+    average: formatTime(avg),
+    median: formatTime(med),
+    rushed: formatTime(l),
+    leisure: formatTime(h)
+  };
+}
+
+function getSpeedrunDetails(avg?: number, med?: number, min?: number, max?: number): SpeedrunDetails {
+  return {
+    average: formatTime(avg),
+    median: formatTime(med),
+    fastest: formatTime(min),
+    slowest: formatTime(max)
+  };
 }

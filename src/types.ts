@@ -12,9 +12,54 @@ export interface GameTimes {
   allPlayStyles: string;
 }
 
+export interface PlaystyleDetails {
+  average: string;
+  median: string;
+  rushed: string;
+  leisure: string;
+}
+
+export interface SpeedrunDetails {
+  average: string;
+  median: string;
+  fastest: string;
+  slowest: string;
+}
+
+export interface InDepthTimes {
+  mainStory?: PlaystyleDetails;
+  mainExtras?: PlaystyleDetails;
+  completionist?: PlaystyleDetails;
+  allPlayStyles?: PlaystyleDetails;
+  anyPercentage?: SpeedrunDetails;
+  hundredPercentage?: SpeedrunDetails;
+  coOp?: PlaystyleDetails;
+  competitive?: PlaystyleDetails;
+}
+
+export interface GameStats {
+  playing: number;
+  backlogs: number;
+  replays: number;
+  retired: number;
+  beat: number;
+}
+
+export interface ReleaseDates {
+  na: string;
+  eu: string;
+  jp: string;
+}
+
 export interface PlatformTime {
   name: string;
   time: string;
+  polled?: number;
+  main?: string;
+  mainExtra?: string;
+  completionist?: string;
+  fastest?: string;
+  slowest?: string;
 }
 
 export interface GameDLC {
@@ -31,9 +76,15 @@ export interface GameDetails {
   platforms: PlatformTime[];
   genres: string[];
   times: GameTimes;
+  inDepthTimes?: InDepthTimes;
   dlcs: GameDLC[];
   rating: string;
   retirementRate: string;
+  summary: string;
+  stats: GameStats;
+  releaseDates: ReleaseDates;
+  alias: string;
+  updated: string;
 }
 
 export class ParserError extends Error {

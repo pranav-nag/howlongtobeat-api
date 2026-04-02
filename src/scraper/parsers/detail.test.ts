@@ -19,8 +19,14 @@ describe('Detail Scraper', () => {
     expect(details.developer).toBe('FromSoftware');
     expect(details.publisher).toBe('Bandai Namco Entertainment');
     expect(details.platforms.length).toBeGreaterThan(0);
+    expect(details.platforms[0].polled).toBeGreaterThan(0);
     expect(details.genres.length).toBeGreaterThan(0);
     expect(details.times.mainStory).not.toBe('Unknown');
     expect(details.times.completionist).not.toBe('Unknown');
+    expect(details.summary).toContain('Golden Order');
+    expect(details.stats.beat).toBeGreaterThan(0);
+    expect(details.releaseDates.na).not.toBe('Unknown');
+    expect(details.inDepthTimes?.mainStory?.average).not.toBe('Unknown');
+    expect(details.rating).not.toBe('Unknown');
   }, 10000); // increase timeout for network requests
 });
