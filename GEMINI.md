@@ -36,6 +36,7 @@ src/
     - Correct `Referer` (`https://howlongtobeat.com/`).
 - **Dynamic Security**: HLTB uses `/api/find/init` to provide `token`, `hpKey`, and `hpVal`. These MUST be used in headers (`x-auth-token`, etc.) and the search payload for every search operation.
 - **Session Persistence**: The `hltb-client` must capture `Set-Cookie` headers and re-send them in subsequent requests within the same process to maintain session validity.
+- **JSON-First Parsing**: HLTB provides detailed metrics in the `__NEXT_DATA__` script tag. Parsers should prioritize this JSON over DOM scraping to ensure high precision for playtimes and community stats.
 
 ## Technical Patterns & Dependencies
 
@@ -45,9 +46,10 @@ src/
     - Use the `appCache` instance in `src/cache/memory.ts`.
     - Default TTL: 24 hours.
     - Include `Cache-Control: public, max-age=86400` in API responses for edge/browser caching.
+    - Bypassing: Routes must support a `force=true` query parameter to refresh stale or structural-breaking cache entries.
 - **TypeScript**:
     - Strictly use interfaces defined in `src/types.ts`.
-    - Avoid `any` except for dynamic security keys in the search payload.
+    - Enriched Schema: `GameDetails` includes comprehensive `inDepthTimes` (avg/med/rushed/leisure) and detailed `stats`. Always ensure new parsers populate these.
 
 ## Testing & Validation Requirements
 
