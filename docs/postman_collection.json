@@ -1,0 +1,77 @@
+{
+	"info": {
+		"_postman_id": "7d9b9c24-5e5d-4a1e-8e8e-8a1e8a1e8a1e",
+		"name": "HowLongToBeat API",
+		"description": "A high-performance REST API for HowLongToBeat.com data. Includes support for in-memory caching and resilient scraping logic.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Search Games",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/search?q=Elden Ring",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Elden Ring",
+							"description": "The search query for the game title."
+						},
+						{
+							"key": "force",
+							"value": "true",
+							"description": "Bypass cache and force a fresh scrape from HLTB (Subject to 5s cooldown).",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Search for games on HowLongToBeat. Returns a list of matches with IDs and basic info."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Game Details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/game/68151",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"game",
+						"68151"
+					],
+					"query": [
+						{
+							"key": "force",
+							"value": "true",
+							"description": "Bypass cache and force a fresh scrape from HLTB (Subject to 5s cooldown).",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Fetch in-depth details for a specific game by its HLTB ID, including comprehensive playtimes, community stats, and release info."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

@@ -58,6 +58,15 @@ npm start
 
 The server will be running on `http://localhost:3000`.
 
+## Testing the API
+
+For a quick start, you can import the provided [Postman Collection](docs/postman_collection.json) found in the `docs/` directory.
+
+The collection includes pre-configured requests for:
+- Searching for games.
+- Fetching full game details by ID.
+- Using the `?force=true` parameter to bypass cache (subject to the 5s cooldown).
+
 ## API Endpoints
 
 ### 1. `GET /api/search?q={game_title}`
