@@ -22,7 +22,7 @@ export async function fetchHltb(url: string, options?: RequestInit): Promise<str
   headers.set('Sec-Ch-Ua-Platform', '"Windows"');
   headers.set('Sec-Fetch-Dest', 'empty');
   headers.set('Sec-Fetch-Mode', 'cors');
-  headers.set('Sec-Fetch-Site', 'same-origin');
+  headers.set('Sec-Fetch-Site', 'cross-site');
 
   if (sessionCookies.length > 0) {
     headers.set('Cookie', sessionCookies.join('; '));

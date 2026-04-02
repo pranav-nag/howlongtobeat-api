@@ -27,7 +27,8 @@ src/
 ### 1. Strict Isolation of Concerns
 - **Parsers (`src/scraper/parsers/`)**: Must remain **pure**. They take a string (HTML/JSON) and return a typed object. They must NEVER perform network requests.
 - **Client (`src/scraper/hltb-client.ts`)**: The ONLY file allowed to interact with the network. It handles User-Agent rotation, cookie persistence, and the HLTB "Initialization -> Search" handshake.
-- **Routes (`src/api/routes.ts`)**: Handles HTTP status codes and caching. Logic for "how" to parse or "how" to fetch must not exist here.
+- **Routes (`src/api/routes.ts`)**: Handles HTTP status codes and caching. Use the `handleCachedRequest` utility to ensure consistent cache behavior, request deduplication (in-flight tracking), and unified error mapping.
+- **Environment Configuration**: Key parameters (TTL, Cooldown) must be configurable via `.env` to support different deployment environments.
 
 ### 2. Scraping & Resilience Standards
 - **Browser Mimicry**: HLTB uses Fastly and strict fingerprinting. Always include:
@@ -44,17 +45,18 @@ src/
 - **Networking**: Use Node.js native `fetch`. Do not add Axios or other heavy networking libraries.
 - **Caching**: 
     - Use the `appCache` instance in `src/cache/memory.ts`.
-    - Default TTL: 24 hours.
-    - Include `Cache-Control: public, max-age=86400` in API responses for edge/browser caching.
-    - Bypassing: Routes must support a `force=true` query parameter to refresh stale or structural-breaking cache entries.
+    - Default TTL: 24 hours (configurable via `CACHE_TTL_SECONDS`).
+    - Include `Cache-Control: public, max-age={TTL}` in API responses for edge/browser caching.
+    - Bypassing: Routes must support a `force=true` query parameter to refresh stale or structural-breaking cache entries, subject to `FORCE_COOLDOWN_MS`.
 - **TypeScript**:
     - Strictly use interfaces defined in `src/types.ts`.
-    - Enriched Schema: `GameDetails` includes comprehensive `inDepthTimes` (avg/med/rushed/leisure) and detailed `stats`. Always ensure new parsers populate these.
+    - Enriched Schema: `GameDetails` includes comprehensive `inDepthTimes` (avg/med/rushed/leisure) and detailed `stats`. Always ensure new parsers populate these, using empty structures for fallbacks.
 
 ## Testing & Validation Requirements
 
 ### 1. Empirical Failure Reproduction
 - Before fixing a scraper bug, you **MUST** create or update a test in `src/scraper/parsers/*.test.ts` that reproduces the failure using the current site structure.
+- **Pure Testing**: Parser tests must use mock HTML/JSON data and never perform real network requests.
 
 ### 2. Verification Suite
 - Every change must pass:
@@ -65,6 +67,7 @@ src/
 ## Error Handling
 - Use `ParserError` for HTML/JSON structure changes.
 - API status `502 Bad Gateway` should be returned when HLTB is inaccessible or the parser is broken. This distinguishes "The Scraper is broken/blocked" from "The API server crashed".
+- **Observability**: Log suppressed errors during in-flight retries to aid in debugging transient issues.
 
 ## Deployment Context
 The project is designed to be deployable to Vercel, Docker, or traditional VPS environments. Keep the implementation stateless and side-effect free outside of the in-memory cache.

@@ -8,9 +8,20 @@ A high-performance, self-hostable REST API for HowLongToBeat.com. Features in-me
 - **Comprehensive Game Details**: Get enriched data including detailed playstyle breakdowns (average, median, rushed, leisure), platform-specific stats, community engagement metrics, and more.
 - **High-Precision Parsing**: Prioritizes HLTB's internal `__NEXT_DATA__` JSON for more accurate time extraction than simple HTML scraping.
 - **Resilient Scraper**: Implements advanced browser-mimicking headers and session-based security (tokens, hpKey) to bypass common protections.
-- **In-Memory Caching**: Built-in 24-hour cache using `node-cache` to improve performance, with a `?force=true` bypass for fresh data.
+- **In-Memory Caching**: Built-in configurable cache using `node-cache` with request deduplication to prevent redundant fetches.
 - **CORS Ready**: Configured for cross-origin requests, perfect for browser extensions or frontend applications.
+- **Steam Integration**: Automatically fetches current Steam prices and calculates a "Value Score" (Playtime per Dollar).
 - **TypeScript**: Fully typed for a better developer experience.
+
+## Configuration
+
+The API can be configured using environment variables. Create a `.env` file based on `.env.example`:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | The port the server will listen on. | `3000` |
+| `CACHE_TTL_SECONDS` | Time-to-live for cached results in seconds. | `86400` (24h) |
+| `FORCE_COOLDOWN_MS` | Cooldown period between forced refreshes per IP. | `5000` (5s) |
 
 ## Tech Stack
 
@@ -39,7 +50,12 @@ A high-performance, self-hostable REST API for HowLongToBeat.com. Features in-me
    npm install
    ```
 
-3. Build the project:
+3. Create a `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Build the project:
    ```bash
    npm run build
    ```
@@ -65,96 +81,27 @@ For a quick start, you can import the provided [Postman Collection](docs/postman
 The collection includes pre-configured requests for:
 - Searching for games.
 - Fetching full game details by ID.
-- Using the `?force=true` parameter to bypass cache (subject to the 5s cooldown).
+- Using the `?force=true` parameter to bypass cache (subject to the cooldown).
 
 ## API Endpoints
 
 ### 1. `GET /api/search?q={game_title}`
 Returns a list of games matching the query. Supports `?force=true` to bypass cache.
 
-**Example Response:**
-```json
-[
-  {
-    "id": "68151",
-    "title": "Elden Ring",
-    "imageUrl": "https://howlongtobeat.com/games/68151_Elden_Ring.jpg",
-    "releaseYear": 2022
-  }
-]
-```
-
 ### 2. `GET /api/game/{game_id}`
 Returns the comprehensive details for a specific game ID. Supports `?force=true` to bypass cache.
 
-**Example Response:**
-```json
-{
-  "id": "68151",
-  "title": "Elden Ring",
-  "imageUrl": "https://howlongtobeat.com/games/68151_Elden_Ring.jpg",
-  "developer": "FromSoftware",
-  "publisher": "Bandai Namco Entertainment",
-  "platforms": [
-    {
-      "name": "PC",
-      "time": "58h 47m",
-      "polled": 6333,
-      "main": "58h 47m",
-      "mainExtra": "101h 57m",
-      "completionist": "142h 29m",
-      "fastest": "12h 57m",
-      "slowest": "508h 15m"
-    }
-  ],
-  "genres": ["Action", "Open World", "Role-Playing"],
-  "times": {
-    "mainStory": "60h",
-    "mainExtras": "101h 11m",
-    "completionist": "135h 34m",
-    "allPlayStyles": "105h 23m"
-  },
-  "timesInMinutes": {
-    "mainStory": 3601,
-    "mainExtras": 6071,
-    "completionist": 8135,
-    "allPlayStyles": 6324
-  },
-  "metrics": {
-    "retirementRate": "2.9%",
-    "backlogCount": 14010,
-    "rating": 93
-  },
-  "inDepthTimes": {
-    "mainStory": {
-      "average": "60h 1m",
-      "median": "60h",
-      "rushed": "36h 29m",
-      "leisure": "87h"
-    }
-  },
-  "dlcs": [
-    { "id": "139385", "title": "Shadow of the Erdtree" }
-  ],
-  "rating": "93%",
-  "retirementRate": "2.9%",
-  "summary": "The Golden Order has been broken...",
-  "stats": {
-    "playing": 494,
-    "backlogs": 14011,
-    "replays": 1267,
-    "retired": 1328,
-    "beat": 20245
-  },
-  "releaseDates": {
-    "na": "2022-02-25",
-    "eu": "2022-02-25",
-    "jp": "2022-02-25"
-  },
-  "alias": "Elden Ring Tarnished Edition",
-  "updated": "24 Mins Ago"
-}
-```
+## Resilience Notice
+
+HowLongToBeat® frequently updates their website's HTML structure and security measures. This scraper is designed to be as resilient as possible by mimicking browser behavior and handling dynamic security tokens. If an endpoint stops working, it is likely that HLTB has changed their internal API or security headers, and the parser may need an update.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Disclaimer
+
+This project is not affiliated with, authorized, maintained, sponsored or endorsed by HowLongToBeat.com or IGN Entertainment, Inc. This is an independent and unofficial API. HowLongToBeat® is a registered trademark of IGN Entertainment, Inc.
 
 ## Resilience Notice
 

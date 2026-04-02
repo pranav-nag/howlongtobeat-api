@@ -1,17 +1,27 @@
 import { parseSearchResponse } from './search';
-import { performSearch } from '../hltb-client';
 import { ParserError } from '../../types';
 
+const MOCK_SEARCH_RESPONSE = JSON.stringify({
+  data: [
+    {
+      game_id: 68151,
+      game_name: "Elden Ring",
+      game_image: "68151_Elden_Ring.jpg",
+      profile_release_year: 2022
+    }
+  ]
+});
+
 describe('Search Scraper', () => {
-  it('should fetch and parse search results for Elden Ring', async () => {
-    const rawJson = await performSearch('Elden Ring');
-    const results = parseSearchResponse(rawJson);
+  it('should parse search results correctly from JSON', () => {
+    const results = parseSearchResponse(MOCK_SEARCH_RESPONSE);
     
-    expect(results.length).toBeGreaterThan(0);
-    const eldenRing = results.find(r => r.id === '68151');
-    expect(eldenRing).toBeDefined();
-    expect(eldenRing?.title).toBe('Elden Ring');
-  }, 10000);
+    expect(results.length).toBe(1);
+    expect(results[0].id).toBe('68151');
+    expect(results[0].title).toBe('Elden Ring');
+    expect(results[0].releaseYear).toBe(2022);
+    expect(results[0].imageUrl).toContain('68151_Elden_Ring.jpg');
+  });
 
   describe('Error Paths', () => {
     it('should throw ParserError for malformed JSON', () => {

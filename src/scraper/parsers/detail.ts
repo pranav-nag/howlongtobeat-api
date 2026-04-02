@@ -165,6 +165,16 @@ export function parseGameDetails(id: string, html: string): GameDetails {
 
     const emptyStats: GameStats = { playing: 0, backlogs: 0, replays: 0, retired: 0, beat: 0 };
     const emptyReleaseDates: ReleaseDates = { na: 'Unknown', eu: 'Unknown', jp: 'Unknown' };
+    const emptyInDepthTimes: InDepthTimes = {
+      mainStory: getPlaystyleDetails(),
+      mainExtras: getPlaystyleDetails(),
+      completionist: getPlaystyleDetails(),
+      allPlayStyles: getPlaystyleDetails(),
+      anyPercentage: getSpeedrunDetails(),
+      hundredPercentage: getSpeedrunDetails(),
+      coOp: getPlaystyleDetails(),
+      competitive: getPlaystyleDetails()
+    };
 
     return {
       id,
@@ -177,6 +187,7 @@ export function parseGameDetails(id: string, html: string): GameDetails {
       times,
       timesInMinutes: { mainStory: 0, mainExtras: 0, completionist: 0, allPlayStyles: 0 },
       metrics: { retirementRate: 'Unknown', backlogCount: 0, rating: 0 },
+      inDepthTimes: emptyInDepthTimes,
       dlcs: [],
       rating: 'Unknown',
       retirementRate: 'Unknown',
