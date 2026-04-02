@@ -67,6 +67,19 @@ export interface GameDLC {
   title: string;
 }
 
+export interface GameTimesInMinutes {
+  mainStory: number;
+  mainExtras: number;
+  completionist: number;
+  allPlayStyles: number;
+}
+
+export interface GameMetrics {
+  retirementRate: string;
+  backlogCount: number;
+  rating: number;
+}
+
 export interface GameDetails {
   id: string;
   title: string;
@@ -76,6 +89,8 @@ export interface GameDetails {
   platforms: PlatformTime[];
   genres: string[];
   times: GameTimes;
+  timesInMinutes: GameTimesInMinutes;
+  metrics: GameMetrics;
   inDepthTimes?: InDepthTimes;
   dlcs: GameDLC[];
   rating: string;
