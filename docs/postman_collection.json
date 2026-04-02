@@ -29,14 +29,31 @@
 						{
 							"key": "force",
 							"value": "true",
-							"description": "Bypass cache and force a fresh scrape from HLTB (Subject to 5s cooldown).",
+							"description": "Bypass cache and force a fresh scrape from HLTB (Subject to cooldown).",
 							"disabled": true
 						}
 					]
 				},
 				"description": "Search for games on HowLongToBeat. Returns a list of matches with IDs and basic info."
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Successful Search",
+					"status": "OK",
+					"code": 200,
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "public, max-age=86400"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						}
+					],
+					"body": "[\n  {\n    \"id\": \"68151\",\n    \"title\": \"Elden Ring\",\n    \"imageUrl\": \"https://howlongtobeat.com/games/68151_Elden_Ring.jpg\",\n    \"releaseYear\": 2022\n  }\n]"
+				}
+			]
 		},
 		{
 			"name": "Get Game Details",
@@ -57,14 +74,31 @@
 						{
 							"key": "force",
 							"value": "true",
-							"description": "Bypass cache and force a fresh scrape from HLTB (Subject to 5s cooldown).",
+							"description": "Bypass cache and force a fresh scrape from HLTB (Subject to cooldown).",
 							"disabled": true
 						}
 					]
 				},
 				"description": "Fetch in-depth details for a specific game by its HLTB ID, including comprehensive playtimes, community stats, and release info."
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Successful Detail Fetch",
+					"status": "OK",
+					"code": 200,
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "public, max-age=86400"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						}
+					],
+					"body": "{\n  \"id\": \"68151\",\n  \"title\": \"Elden Ring\",\n  \"imageUrl\": \"https://howlongtobeat.com/games/68151_Elden_Ring.jpg\",\n  \"developer\": \"FromSoftware\",\n  \"publisher\": \"Bandai Namco Entertainment\",\n  \"platforms\": [\n    {\n      \"name\": \"PC\",\n      \"time\": \"58h 47m\",\n      \"polled\": 6333,\n      \"main\": \"58h 47m\",\n      \"mainExtra\": \"101h 57m\",\n      \"completionist\": \"142h 29m\",\n      \"fastest\": \"12h 57m\",\n      \"slowest\": \"508h 15m\"\n    }\n  ],\n  \"genres\": [\"Action\", \"Open World\", \"Role-Playing\"],\n  \"times\": {\n    \"mainStory\": \"60h\",\n    \"mainExtras\": \"101h 11m\",\n    \"completionist\": \"135h 34m\",\n    \"allPlayStyles\": \"105h 23m\"\n  },\n  \"timesInMinutes\": {\n    \"mainStory\": 3601,\n    \"mainExtras\": 6071,\n    \"completionist\": 8135,\n    \"allPlayStyles\": 6324\n  },\n  \"metrics\": {\n    \"retirementRate\": \"2.9%\",\n    \"backlogCount\": 14010,\n    \"rating\": 93\n  },\n  \"inDepthTimes\": {\n    \"mainStory\": {\n      \"average\": \"60h 1m\",\n      \"median\": \"60h\",\n      \"rushed\": \"36h 29m\",\n      \"leisure\": \"87h\"\n    }\n  },\n  \"dlcs\": [\n    { \"id\": \"139385\", \"title\": \"Shadow of the Erdtree\" }\n  ],\n  \"rating\": \"93%\",\n  \"retirementRate\": \"2.9%\",\n  \"summary\": \"The Golden Order has been broken...\",\n  \"stats\": {\n    \"playing\": 494,\n    \"backlogs\": 14011,\n    \"replays\": 1267,\n    \"retired\": 1328,\n    \"beat\": 20245\n  },\n  \"releaseDates\": {\n    \"na\": \"2022-02-25\",\n    \"eu\": \"2022-02-25\",\n    \"jp\": \"2022-02-25\"\n  },\n  \"alias\": \"Elden Ring Tarnished Edition\",\n  \"updated\": \"24 Mins Ago\",\n  \"steamId\": 1245620,\n  \"price\": {\n    \"currency\": \"USD\",\n    \"initial\": 5999,\n    \"final\": 5999,\n    \"discount_percent\": 0,\n    \"formatted\": \"$59.99\"\n  },\n  \"valueScore\": 101\n}"
+				}
+			]
 		}
 	],
 	"variable": [
