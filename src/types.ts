@@ -67,6 +67,14 @@ export interface GameDLC {
   title: string;
 }
 
+export interface GamePrice {
+  currency: string;
+  initial: number;
+  final: number;
+  discount_percent: number;
+  formatted: string;
+}
+
 export interface GameTimesInMinutes {
   mainStory: number;
   mainExtras: number;
@@ -100,6 +108,9 @@ export interface GameDetails {
   releaseDates: ReleaseDates;
   alias: string;
   updated: string;
+  steamId?: number;
+  price?: GamePrice;
+  valueScore?: number;
 }
 
 export class ParserError extends Error {
