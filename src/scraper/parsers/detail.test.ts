@@ -36,7 +36,8 @@ describe('Detail Scraper', () => {
     expect(details.metrics.rating).toBeGreaterThan(0);
     expect(details.metrics.backlogCount).toBeGreaterThan(0);
     expect(details.metrics.retirementRate).not.toBe('Unknown');
-  }, 10000); // increase timeout for network requests
+    expect(details.steamId).toBe(1245620);
+  }, 15000); // increase timeout for network requests
 
   describe('Error Paths', () => {
     it('should throw ParserError when __NEXT_DATA__ is missing', () => {

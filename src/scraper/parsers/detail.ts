@@ -112,7 +112,8 @@ export function parseGameDetails(id: string, html: string): GameDetails {
             stats,
             releaseDates,
             alias: gameData.game_alias || '',
-            updated: updatedText || (gameData.added_stats ? String(gameData.added_stats) : '')
+            updated: updatedText || (gameData.added_stats ? String(gameData.added_stats) : ''),
+            steamId: gameData.profile_steam || undefined
           };
         }
       } catch (e) {
