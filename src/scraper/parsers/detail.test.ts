@@ -29,6 +29,13 @@ describe('Detail Scraper', () => {
     expect(details.releaseDates.na).not.toBe('Unknown');
     expect(details.inDepthTimes?.mainStory?.average).not.toBe('Unknown');
     expect(details.rating).not.toBe('Unknown');
+    
+    // New fields
+    expect(details.timesInMinutes.mainStory).toBeGreaterThan(0);
+    expect(details.timesInMinutes.completionist).toBeGreaterThan(details.timesInMinutes.mainStory);
+    expect(details.metrics.rating).toBeGreaterThan(0);
+    expect(details.metrics.backlogCount).toBeGreaterThan(0);
+    expect(details.metrics.retirementRate).not.toBe('Unknown');
   }, 10000); // increase timeout for network requests
 
   describe('Error Paths', () => {
