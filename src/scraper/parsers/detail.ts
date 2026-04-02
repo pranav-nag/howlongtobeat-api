@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio';
 import { 
   GameDetails, ParserError, PlatformTime, GameDLC, 
   PlaystyleDetails, SpeedrunDetails, InDepthTimes, 
-  GameStats, ReleaseDates 
+  GameStats, ReleaseDates, GameTimesInMinutes, GameMetrics 
 } from '../../types';
 
 export function parseGameDetails(id: string, html: string): GameDetails {
@@ -73,6 +73,21 @@ export function parseGameDetails(id: string, html: string): GameDetails {
             jp: gameData.release_jp ? String(gameData.release_jp) : 'Unknown'
           };
 
+          const timesInMinutes: GameTimesInMinutes = {
+            mainStory: secondsToMinutes(gameData.comp_main),
+            mainExtras: secondsToMinutes(gameData.comp_plus),
+            completionist: secondsToMinutes(gameData.comp_100),
+            allPlayStyles: secondsToMinutes(gameData.comp_all)
+          };
+
+          const metrics: GameMetrics = {
+            retirementRate: gameData.count_retired && gameData.count_total 
+              ? `${((gameData.count_retired / gameData.count_total) * 100).toFixed(1)}%` 
+              : 'Unknown',
+            backlogCount: gameData.count_backlog || 0,
+            rating: gameData.review_score || 0
+          };
+
           return {
             id,
             title: gameData.game_name || 'Unknown Title',
@@ -87,12 +102,12 @@ export function parseGameDetails(id: string, html: string): GameDetails {
               completionist: formatTime(gameData.comp_100),
               allPlayStyles: formatTime(gameData.comp_all)
             },
+            timesInMinutes,
+            metrics,
             inDepthTimes,
             dlcs,
             rating: gameData.review_score ? `${gameData.review_score}%` : 'Unknown',
-            retirementRate: gameData.count_retired && gameData.count_total 
-              ? `${((gameData.count_retired / gameData.count_total) * 100).toFixed(1)}%` 
-              : 'Unknown',
+            retirementRate: metrics.retirementRate,
             summary: gameData.profile_summary || '',
             stats,
             releaseDates,
@@ -159,6 +174,8 @@ export function parseGameDetails(id: string, html: string): GameDetails {
       platforms,
       genres,
       times,
+      timesInMinutes: { mainStory: 0, mainExtras: 0, completionist: 0, allPlayStyles: 0 },
+      metrics: { retirementRate: 'Unknown', backlogCount: 0, rating: 0 },
       dlcs: [],
       rating: 'Unknown',
       retirementRate: 'Unknown',
@@ -206,4 +223,9 @@ function getSpeedrunDetails(avg?: number, med?: number, min?: number, max?: numb
     fastest: formatTime(min),
     slowest: formatTime(max)
   };
+}
+
+function secondsToMinutes(seconds: number | undefined): number {
+  if (!seconds) return 0;
+  return Math.round(seconds / 60);
 }
