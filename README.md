@@ -114,6 +114,17 @@ Returns the comprehensive details for a specific game ID. Supports `?force=true`
     "completionist": "135h 34m",
     "allPlayStyles": "105h 23m"
   },
+  "timesInMinutes": {
+    "mainStory": 3601,
+    "mainExtras": 6071,
+    "completionist": 8135,
+    "allPlayStyles": 6324
+  },
+  "metrics": {
+    "retirementRate": "2.9%",
+    "backlogCount": 14010,
+    "rating": 93
+  },
   "inDepthTimes": {
     "mainStory": {
       "average": "60h 1m",
