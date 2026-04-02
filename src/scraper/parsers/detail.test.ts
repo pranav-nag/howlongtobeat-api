@@ -1,5 +1,6 @@
 import { parseGameDetails } from './detail';
 import { fetchHltb } from '../hltb-client';
+import { ParserError } from '../../types';
 
 describe('Detail Scraper', () => {
   it('should fetch and parse details for Elden Ring (68151)', async () => {
@@ -29,4 +30,11 @@ describe('Detail Scraper', () => {
     expect(details.inDepthTimes?.mainStory?.average).not.toBe('Unknown');
     expect(details.rating).not.toBe('Unknown');
   }, 10000); // increase timeout for network requests
+
+  describe('Error Paths', () => {
+    it('should throw ParserError when __NEXT_DATA__ is missing', () => {
+      const html = '<html><body>No data here</body></html>';
+      expect(() => parseGameDetails('123', html)).toThrow(ParserError);
+    });
+  });
 });

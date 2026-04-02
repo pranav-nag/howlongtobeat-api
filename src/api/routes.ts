@@ -8,6 +8,9 @@ import { fetchHltb, ensureSession, performSearch } from '../scraper/hltb-client'
 export const apiRouter = Router();
 
 const CACHE_MAX_AGE = 86400; // 24 hours
+const inFlightRequests = new Map<string, Promise<any>>();
+const lastForceRefresh = new Map<string, number>();
+const FORCE_COOLDOWN = 5000; // 5 seconds
 
 apiRouter.get('/search', async (req: Request, res: Response): Promise<void> => {
   const query = req.query.q as string;
@@ -28,11 +31,41 @@ apiRouter.get('/search', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  try {
+  if (force) {
+    const now = Date.now();
+    const last = lastForceRefresh.get(req.ip || 'unknown') || 0;
+    if (now - last < FORCE_COOLDOWN) {
+      res.status(429).json({ error: 'Force refresh cooldown active. Please wait.' });
+      return;
+    }
+    lastForceRefresh.set(req.ip || 'unknown', now);
+  }
+
+  const executeSearch = async () => {
     const rawJson = await performSearch(query);
     const results = parseSearchResponse(rawJson);
-    
-    appCache.set(cacheKey, results);
+    const success = appCache.set(cacheKey, results);
+    if (!success) {
+      console.warn(`Cache set failed for key: ${cacheKey}`);
+    }
+    return results;
+  };
+
+  if (inFlightRequests.has(cacheKey)) {
+    try {
+      const results = await inFlightRequests.get(cacheKey);
+      res.json(results);
+      return;
+    } catch (error) {
+      // If previous failed, we'll try again
+    }
+  }
+
+  const searchPromise = executeSearch();
+  inFlightRequests.set(cacheKey, searchPromise);
+
+  try {
+    const results = await searchPromise;
     res.json(results);
   } catch (error: any) {
     console.error('Search error:', error.message);
@@ -48,6 +81,8 @@ apiRouter.get('/search', async (req: Request, res: Response): Promise<void> => {
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
+  } finally {
+    inFlightRequests.delete(cacheKey);
   }
 });
 
@@ -65,13 +100,40 @@ apiRouter.get('/game/:id', async (req: Request, res: Response): Promise<void> =>
     return;
   }
 
-  try {
+  if (force) {
+    const now = Date.now();
+    const last = lastForceRefresh.get(req.ip || 'unknown') || 0;
+    if (now - last < FORCE_COOLDOWN) {
+      res.status(429).json({ error: 'Force refresh cooldown active. Please wait.' });
+      return;
+    }
+    lastForceRefresh.set(req.ip || 'unknown', now);
+  }
+
+  const executeGetDetails = async () => {
     await ensureSession();
     const html = await fetchHltb(`https://howlongtobeat.com/game/${id}`);
-    
     const details = parseGameDetails(id, html);
-    
-    appCache.set(cacheKey, details);
+    const success = appCache.set(cacheKey, details);
+    if (!success) {
+      console.warn(`Cache set failed for key: ${cacheKey}`);
+    }
+    return details;
+  };
+
+  if (inFlightRequests.has(cacheKey)) {
+    try {
+      const details = await inFlightRequests.get(cacheKey);
+      res.json(details);
+      return;
+    } catch (error) {}
+  }
+
+  const detailsPromise = executeGetDetails();
+  inFlightRequests.set(cacheKey, detailsPromise);
+
+  try {
+    const details = await detailsPromise;
     res.json(details);
   } catch (error: any) {
     console.error('Details error:', error.message);
@@ -87,5 +149,7 @@ apiRouter.get('/game/:id', async (req: Request, res: Response): Promise<void> =>
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
+  } finally {
+    inFlightRequests.delete(cacheKey);
   }
 });

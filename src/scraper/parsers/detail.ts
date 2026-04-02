@@ -107,6 +107,10 @@ export function parseGameDetails(id: string, html: string): GameDetails {
 
     // Fallback to DOM parsing
     const titleNode = $('.GameHeader-module__zQS9VW__profile_header.shadow_text');
+    if (titleNode.length === 0 && !nextDataScript) {
+      throw new ParserError('Could not find game data in __NEXT_DATA__ or DOM');
+    }
+    
     titleNode.children().remove();
     const title = titleNode.text().trim() || 'Unknown Title';
 
