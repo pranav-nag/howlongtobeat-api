@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { parseSearchResponse } from '../scraper/parsers/search';
 import { parseGameDetails } from '../scraper/parsers/detail';
+import { fetchSteamPrice } from '../scraper/price-client';
 import { appCache } from '../cache/memory';
 import { ParserError } from '../types';
 import { fetchHltb, ensureSession, performSearch } from '../scraper/hltb-client';
@@ -114,6 +115,17 @@ apiRouter.get('/game/:id', async (req: Request, res: Response): Promise<void> =>
     await ensureSession();
     const html = await fetchHltb(`https://howlongtobeat.com/game/${id}`);
     const details = parseGameDetails(id, html);
+
+    // Concurrent fetch if steamId exists
+    if (details.steamId) {
+      const price = await fetchSteamPrice(details.steamId);
+      if (price) {
+        details.price = price;
+        const priceInDollars = price.final / 100 || 0.01;
+        details.valueScore = Math.round(details.timesInMinutes.mainExtras / priceInDollars);
+      }
+    }
+
     const success = appCache.set(cacheKey, details);
     if (!success) {
       console.warn(`Cache set failed for key: ${cacheKey}`);
