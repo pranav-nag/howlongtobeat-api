@@ -21,7 +21,7 @@
     "typescript",
     "express"
   ],
-  "author": "",
+  "author": "pranav-nag",
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {

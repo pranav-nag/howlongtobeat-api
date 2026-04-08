@@ -41,8 +41,8 @@ The API can be configured using environment variables. Create a `.env` file base
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/[your-username]/hltb-scrapper.git
-   cd hltb-scrapper
+   git clone https://github.com/pranav-nag/howlongtobeat-api.git
+   cd howlongtobeat-api
    ```
 
 2. Install dependencies:
@@ -90,18 +90,6 @@ Returns a list of games matching the query. Supports `?force=true` to bypass cac
 
 ### 2. `GET /api/game/{game_id}`
 Returns the comprehensive details for a specific game ID. Supports `?force=true` to bypass cache.
-
-## Resilience Notice
-
-HowLongToBeat® frequently updates their website's HTML structure and security measures. This scraper is designed to be as resilient as possible by mimicking browser behavior and handling dynamic security tokens. If an endpoint stops working, it is likely that HLTB has changed their internal API or security headers, and the parser may need an update.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Disclaimer
-
-This project is not affiliated with, authorized, maintained, sponsored or endorsed by HowLongToBeat.com or IGN Entertainment, Inc. This is an independent and unofficial API. HowLongToBeat® is a registered trademark of IGN Entertainment, Inc.
 
 ## Resilience Notice
 
