@@ -28,97 +28,43 @@ Get comprehensive game intelligence with a single request.
 }
 ```
 
-- **In-Memory Caching**: Built-in configurable cache using `node-cache` with request deduplication to prevent redundant fetches.
-- **CORS Ready**: Configured for cross-origin requests, perfect for browser extensions or frontend applications.
-- **Steam Integration**: Automatically fetches current Steam prices and calculates a "Value Score" (Playtime per Dollar).
-- **TypeScript**: Fully typed for a better developer experience.
+## Endpoints
+
+### Discovery
+`GET /api/search?q={query}`  
+Locate game IDs and basic metadata. Supports `?force=true`.
+
+### Intelligence
+`GET /api/game/{id}`  
+Comprehensive stats, community metrics, and playtimes. Supports `?force=true`.
+
+## Unique Features
+
+- **Value Score**: Automatically calculates "Playtime per Dollar" by integrating live Steam pricing.
+- **In-Memory Caching**: Configurable TTL with request deduplication to prevent redundant HLTB fetches.
+- **JSON-First Parsing**: Prioritizes HLTB's internal data structures over fragile DOM scraping.
+
+## Tech Stack
+**Node.js 18+** • **Express** • **TypeScript** • **Cheerio**
 
 ## Configuration
 
-The API can be configured using environment variables. Create a `.env` file based on `.env.example`:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3000` | Server port |
+| `CACHE_TTL_SECONDS` | `86400` | Cache TTL (seconds) |
+| `FORCE_COOLDOWN_MS` | `5000` | Refresh cooldown (ms) |
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | The port the server will listen on. | `3000` |
-| `CACHE_TTL_SECONDS` | Time-to-live for cached results in seconds. | `86400` (24h) |
-| `FORCE_COOLDOWN_MS` | Cooldown period between forced refreshes per IP. | `5000` (5s) |
+## Setup
 
-## Tech Stack
-
-- **Runtime**: Node.js (v18+)
-- **Framework**: Express.js
-- **HTML Parsing**: Cheerio
-- **Language**: TypeScript
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js v18 or higher
-- npm
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/pranav-nag/howlongtobeat-api.git
-   cd howlongtobeat-api
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create a `.env` file:
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Build the project:
-   ```bash
-   npm run build
-   ```
-
-### Running the API
-
-Start the server in development mode:
 ```bash
-npm run dev
+git clone https://github.com/pranav-nag/howlongtobeat-api.git
+npm install && cp .env.example .env
+npm run build && npm start
 ```
 
-Start the production server:
-```bash
-npm start
-```
+## Resilience & Legal
 
-The server will be running on `http://localhost:3000`.
+This API mimics browser behavior to ensure uptime. If endpoints fail, the site's structure may have changed. Import the [Postman Collection](docs/postman_collection.json) for testing.
 
-## Testing the API
-
-For a quick start, you can import the provided [Postman Collection](docs/postman_collection.json) found in the `docs/` directory.
-
-The collection includes pre-configured requests for:
-- Searching for games.
-- Fetching full game details by ID.
-- Using the `?force=true` parameter to bypass cache (subject to the cooldown).
-
-## API Endpoints
-
-### 1. `GET /api/search?q={game_title}`
-Returns a list of games matching the query. Supports `?force=true` to bypass cache.
-
-### 2. `GET /api/game/{game_id}`
-Returns the comprehensive details for a specific game ID. Supports `?force=true` to bypass cache.
-
-## Resilience Notice
-
-HowLongToBeat® frequently updates their website's HTML structure and security measures. This scraper is designed to be as resilient as possible by mimicking browser behavior and handling dynamic security tokens. If an endpoint stops working, it is likely that HLTB has changed their internal API or security headers, and the parser may need an update.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Disclaimer
-
-This project is not affiliated with, authorized, maintained, sponsored or endorsed by HowLongToBeat.com or IGN Entertainment, Inc. This is an independent and unofficial API. HowLongToBeat® is a registered trademark of IGN Entertainment, Inc.
+Distributed under the **MIT License**. This project is an independent, unofficial API and is not affiliated with or endorsed by HowLongToBeat.com or IGN Entertainment, Inc.
