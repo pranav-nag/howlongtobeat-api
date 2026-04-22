@@ -1,13 +1,14 @@
-# howlongtobeat-api
+# howlongtobeat-api ![Version](https://img.shields.edge/badge/version-1.0.0-black?style=flat-square)
 
-A high-performance, self-hostable REST API for HowLongToBeat.com. Features in-memory caching, TypeScript support, and resilient scraping logic to bypass security headers.
+> A resilient, developer-first bridge to HowLongToBeat® data. Built for precision, engineered for uptime.
 
-## Features
+## Engineered for Uptime
 
-- **Search Games**: Search for games by title and get basic info (ID, title, image, release year).
-- **Comprehensive Game Details**: Get enriched data including detailed playstyle breakdowns (average, median, rushed, leisure), platform-specific stats, community engagement metrics, and more.
-- **High-Precision Parsing**: Prioritizes HLTB's internal `__NEXT_DATA__` JSON for more accurate time extraction than simple HTML scraping.
-- **Resilient Scraper**: Implements advanced browser-mimicking headers and session-based security (tokens, hpKey) to bypass common protections.
+Most scrapers break when the target site updates its security. This API uses a **browser-accurate handshake**—including persistent session cookies, randomized but consistent User-Agents, and matching platform headers—to bypass `403 Forbidden` blocks and ensure your dashboards stay live.
+
+[ ★ STAR ON GITHUB ](https://github.com/pranav-nag/howlongtobeat-api)
+
+
 - **In-Memory Caching**: Built-in configurable cache using `node-cache` with request deduplication to prevent redundant fetches.
 - **CORS Ready**: Configured for cross-origin requests, perfect for browser extensions or frontend applications.
 - **Steam Integration**: Automatically fetches current Steam prices and calculates a "Value Score" (Playtime per Dollar).
