@@ -8,6 +8,25 @@ Most scrapers break when the target site updates its security. This API uses a *
 
 [ ★ STAR ON GITHUB ](https://github.com/pranav-nag/howlongtobeat-api)
 
+## API in Action
+
+Get comprehensive game intelligence with a single request.
+
+```json
+// GET /api/game/10270
+{
+  "title": "The Witcher 3: Wild Hunt",
+  "times": {
+    "mainStory": "51h 36m",
+    "mainExtras": "103h",
+    "completionist": "173h"
+  },
+  "rating": "93%",
+  "steamId": 292030,
+  "price": { "final_formatted": "₹ 359" },
+  "valueScore": 17 // Playtime (mins) per Dollar
+}
+```
 
 - **In-Memory Caching**: Built-in configurable cache using `node-cache` with request deduplication to prevent redundant fetches.
 - **CORS Ready**: Configured for cross-origin requests, perfect for browser extensions or frontend applications.
