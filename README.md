@@ -1,4 +1,4 @@
-# howlongtobeat-api ![Version](https://img.shields.edge/badge/version-1.0.0-black?style=flat-square)
+# howlongtobeat-api ![Version](https://img.shields.io/badge/version-1.0.0-black?style=flat-square)
 
 > A resilient, developer-first bridge to HowLongToBeat® data. Built for precision, engineered for uptime.
 
@@ -23,7 +23,7 @@ Get comprehensive game intelligence with a single request.
   },
   "rating": "93%",
   "steamId": 292030,
-  "price": { "final_formatted": "₹ 359" },
+  "price": { "formatted": "₹ 359" },
   "valueScore": 17 // Playtime (mins) per Dollar
 }
 ```
@@ -63,8 +63,10 @@ npm install && cp .env.example .env
 npm run build && npm start
 ```
 
-## Resilience & Legal
+---
 
-This API mimics browser behavior to ensure uptime. If endpoints fail, the site's structure may have changed. Import the [Postman Collection](docs/postman_collection.json) for testing.
+## Legal & Support
 
-Distributed under the **MIT License**. This project is an independent, unofficial API and is not affiliated with or endorsed by HowLongToBeat.com or IGN Entertainment, Inc.
+Import the [Postman Collection](docs/postman_collection.json) for testing.
+
+Distributed under the [MIT License](LICENSE). This project is an independent, unofficial API and is not affiliated with or endorsed by HowLongToBeat.com or IGN Entertainment, Inc.

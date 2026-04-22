@@ -10,7 +10,7 @@
   "steamId": 292030,
   "price": {
     "currency": "INR",
-    "final_formatted": "₹ 359"
+    "formatted": "₹ 359"
   },
   "valueScore": 17
 }
