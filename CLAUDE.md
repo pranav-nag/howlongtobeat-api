@@ -29,7 +29,7 @@ src/
 ├── scraper/
 │   ├── hltb-client.ts  # Low-level HTTP client (only file allowed to do network I/O)
 │   └── parsers/
-│       ├── search.ts   # Parses JSON search results from /api/find
+│       ├── search.ts   # Parses JSON search results from /api/bleed
 │       └── detail.ts   # Parses game detail HTML (prefers __NEXT_DATA__ JSON)
 ├── types.ts            # All shared TypeScript interfaces
 └── index.ts            # Entry point
@@ -37,15 +37,15 @@ src/
 
 **Strict layer separation:**
 - **Parsers** are pure functions: `(string) => TypedObject`. No network calls ever.
-- **hltb-client.ts** is the only network layer. It manages User-Agent rotation, cookie/session persistence, and the HLTB security handshake (`/api/find/init` → `token`, `hpKey`, `hpVal`).
+- **hltb-client.ts** is the only network layer. It manages User-Agent rotation, cookie/session persistence, and the HLTB security handshake (`/api/bleed/init` → `token`, `hpKey`, `hpVal`).
 - **routes.ts** owns HTTP status codes and cache logic. No fetch or parse logic belongs here.
 
 ## Key Implementation Details
 
 **HLTB Security Handshake (search flow):**
 1. `ensureSession()` — GET homepage to acquire session cookies (re-runs every 30 min or when cookies are absent)
-2. GET `/api/find/init?t={timestamp}` — returns `{ token, hpKey, hpVal }`
-3. POST `/api/find` — payload includes `hpKey`/`hpVal` fields; headers include `x-auth-token`, `x-hp-key`, `x-hp-val`
+2. GET `/api/bleed/init?t={timestamp}` — returns `{ token, hpKey, hpVal }`
+3. POST `/api/bleed` — payload includes `hpKey`/`hpVal` fields; headers include `x-auth-token`, `x-hp-key`, `x-hp-val`
 
 **Browser mimicry headers** (`hltb-client.ts`): always send `Sec-Ch-Ua`, `Sec-Fetch-Dest/Mode/Site`, `Referer: https://howlongtobeat.com/`, and a randomized modern User-Agent.
 

@@ -72,7 +72,7 @@ export async function ensureSession(): Promise<void> {
 export async function performSearch(query: string): Promise<string> {
   await ensureSession();
 
-  const initResponse = await fetchHltb(`https://howlongtobeat.com/api/find/init?t=${Date.now()}`);
+  const initResponse = await fetchHltb(`https://howlongtobeat.com/api/bleed/init?t=${Date.now()}`);
   let security;
   try {
     security = JSON.parse(initResponse);
@@ -111,7 +111,7 @@ export async function performSearch(query: string): Promise<string> {
     payload[hpKey] = hpVal;
   }
   
-  return fetchHltb('https://howlongtobeat.com/api/find', {
+  return fetchHltb('https://howlongtobeat.com/api/bleed', {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',

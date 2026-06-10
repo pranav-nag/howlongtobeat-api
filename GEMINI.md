@@ -35,7 +35,7 @@ src/
     - Randomized modern User-Agents.
     - `Sec-Ch-Ua`, `Sec-Fetch-Dest`, `Sec-Fetch-Mode`, `Sec-Fetch-Site` headers.
     - Correct `Referer` (`https://howlongtobeat.com/`).
-- **Dynamic Security**: HLTB uses `/api/find/init` to provide `token`, `hpKey`, and `hpVal`. These MUST be used in headers (`x-auth-token`, etc.) and the search payload for every search operation.
+- **Dynamic Security**: HLTB uses `/api/bleed/init` to provide `token`, `hpKey`, and `hpVal`. These MUST be used in headers (`x-auth-token`, etc.) and the search payload for every search operation.
 - **Session Persistence**: The `hltb-client` must capture `Set-Cookie` headers and re-send them in subsequent requests within the same process to maintain session validity.
 - **JSON-First Parsing**: HLTB provides detailed metrics in the `__NEXT_DATA__` script tag. Parsers should prioritize this JSON over DOM scraping to ensure high precision for playtimes and community stats.
 
